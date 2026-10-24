@@ -298,8 +298,10 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
     // Tab strip.
     egui::Panel::top("tabs")
         .exact_size(30.0)
+        .show_separator_line(!crate::classic::active(ui.ctx()))
         .frame(egui::Frame::NONE.fill(t.tab_strip).inner_margin(egui::Margin { left: 8, right: 10, top: 0, bottom: 0 }))
         .show(ui, |ui| {
+            crate::classic::tab_strip(ui, 8.0, 10.0);
             ui.horizontal_centered(|ui| {
                 ui.spacing_mut().item_spacing = vec2(2.0, 0.0);
                 // Share, Editing mode and Comments keep their room; the tabs get what is left of it
@@ -402,6 +404,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                             }
                             let active = app.ui.tab == tab && !app.ui.backstage;
                             resp.widget_info(|| egui::WidgetInfo::selected(egui::WidgetType::SelectableLabel, true, active, shown));
+                            let (r, t) = crate::classic::tab(ui, r, t, tab == "File", active, resp.hovered(), app.ui.backstage);
                             if resp.hovered() && !active {
                                 ui.painter().rect_filled(r.shrink2(vec2(0.0, 4.0)), 4.0, t.hover);
                             }
@@ -488,6 +491,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
             egui::Frame::NONE.fill(t.ribbon).inner_margin(egui::Margin { left: 8, right: 8, top: 4, bottom: 4 }).stroke(Stroke::new(1.0, t.border)),
         )
         .show(ui, |ui| {
+            crate::classic::ribbon_body(ui, egui::Margin { left: 8, right: 8, top: 4, bottom: 4 });
             // Right-click on the ribbon (outside a button): Customize Ribbon. Registered first, so
             // the buttons drawn over it keep their own clicks.
             // No document open (#1129): every command is greyed out but Help's.

@@ -285,9 +285,11 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
     let control_h = if mac { 22.0 } else { 26.0 };
     egui::Panel::top("title_bar")
         .exact_size(if mac { bar.height } else { 38.0 })
+        .show_separator_line(!crate::classic::active(ui.ctx()))
         .frame(egui::Frame::NONE.fill(t.title_bar).inner_margin(egui::Margin { left, right: 10, top: 0, bottom: 0 }))
         .show(ui, |ui| {
             let full = ui.max_rect();
+            crate::classic::title_bar(ui, f32::from(left), 10.0);
             // Drag the window by the title bar (integrated title bar on macOS).
             let drag = ui.interact(full, ui.id().with("title_drag"), Sense::click_and_drag());
             if drag.drag_started() {
@@ -547,6 +549,7 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                 .stroke(Stroke::new(1.0, t.border)),
         )
         .show(ui, |ui| {
+            crate::classic::status_bar(ui, 12.0, 12.0);
             // No document open (#1129): an empty status bar.
             if !app.has_document() {
                 return;
