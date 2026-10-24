@@ -18,11 +18,12 @@ pub enum Appearance {
     Dark,
     #[default]
     System,
+    ClassicBlue,
 }
 
 impl Appearance {
     /// In menu order.
-    pub const ALL: [Appearance; 3] = [Appearance::System, Appearance::Light, Appearance::Dark];
+    pub const ALL: [Appearance; 4] = [Appearance::System, Appearance::Light, Appearance::Dark, Appearance::ClassicBlue];
 
     /// The value used in `ui.json` and by the `ui.theme` command.
     pub fn code(self) -> &'static str {
@@ -30,6 +31,7 @@ impl Appearance {
             Appearance::Light => "light",
             Appearance::Dark => "dark",
             Appearance::System => "system",
+            Appearance::ClassicBlue => "classic-blue",
         }
     }
 
@@ -43,6 +45,7 @@ impl Appearance {
             Appearance::Light => "Light",
             Appearance::Dark => "Dark",
             Appearance::System => "Use system setting",
+            Appearance::ClassicBlue => "Classic Blue",
         }
     }
 
@@ -50,7 +53,7 @@ impl Appearance {
     /// `System` falls back to light when the OS reports none.
     pub fn is_dark(self, system: Option<egui::Theme>) -> bool {
         match self {
-            Appearance::Light => false,
+            Appearance::Light | Appearance::ClassicBlue => false,
             Appearance::Dark => true,
             Appearance::System => system == Some(egui::Theme::Dark),
         }
@@ -59,7 +62,7 @@ impl Appearance {
     /// The egui theme preference: `System` stays automatic rather than resolving to a fixed theme.
     pub fn preference(self) -> egui::ThemePreference {
         match self {
-            Appearance::Light => egui::ThemePreference::Light,
+            Appearance::Light | Appearance::ClassicBlue => egui::ThemePreference::Light,
             Appearance::Dark => egui::ThemePreference::Dark,
             Appearance::System => egui::ThemePreference::System,
         }
@@ -435,6 +438,9 @@ impl Tokens {
         }
     }
     pub fn get(ctx: &egui::Context) -> Tokens {
+        if let Some(t) = crate::classic::tokens(ctx) {
+            return t;
+        }
         if ctx.global_style().visuals.dark_mode { Tokens::dark() } else { Tokens::light() }
     }
 }
@@ -760,6 +766,7 @@ pub fn apply(ctx: &egui::Context, appearance: Appearance) {
         o.fallback_theme = egui::Theme::Light;
         o.theme_preference = appearance.preference();
     });
+    crate::classic::apply(ctx, appearance);
 }
 
 /// Turn egui's own animations on or off: hover and press fades, menus, tooltips and windows fading
@@ -774,7 +781,7 @@ pub fn apply_animations(ctx: &egui::Context, on: bool) {
 }
 
 /// egui's visuals for one of our palettes.
-fn visuals(t: &Tokens) -> Visuals {
+pub(crate) fn visuals(t: &Tokens) -> Visuals {
     let mut v = if t.dark { Visuals::dark() } else { Visuals::light() };
     v.panel_fill = t.ribbon;
     v.window_fill = t.menu;

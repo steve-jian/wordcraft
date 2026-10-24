@@ -28,6 +28,7 @@ pub mod backstage;
 pub mod canvas;
 pub mod caret_glide;
 pub mod chrome;
+pub mod classic;
 pub mod colors;
 pub mod content_controls;
 pub mod control;

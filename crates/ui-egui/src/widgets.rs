@@ -188,6 +188,9 @@ pub fn enabled(app: &WordApp, id: &str) -> bool {
 }
 
 pub(crate) fn bg(ui: &Ui, r: Rect, resp: &Response, checked: bool, t: &Tokens) {
+    if crate::classic::button_bg(ui, r, resp, checked) {
+        return;
+    }
     let fill = if resp.is_pointer_button_down_on() {
         t.pressed
     } else if checked {
@@ -463,6 +466,7 @@ pub fn group_titled(ui: &mut Ui, id_title: &str, title: &str, launcher: Option<&
     ui.add_space(5.0);
     let x = ui.cursor().min.x;
     ui.painter().line_segment([pos2(x, start.y + 4.0), pos2(x, start.y + CONTENT_H + LABEL_H - 4.0)], Stroke::new(1.0, t.border));
+    crate::classic::group_separator(ui, x, start.y + 4.0, start.y + CONTENT_H + LABEL_H - 4.0);
     ui.add_space(6.0);
     crate::ribbon_fit::record(ui.ctx(), id_title, level, ui.cursor().min.x - start.x);
 }
